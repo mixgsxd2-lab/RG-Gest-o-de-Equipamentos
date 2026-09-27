@@ -6,7 +6,8 @@ Software de **Gestão de Manutenção Geral** do Hospital Rio Grande (RG): plata
 **abertura do chamado → recebimento → execução → materiais/custos → fechamento → histórico → indicadores**
 
 > ⚠️ **DEMONSTRAÇÃO** — a instalação padrão carrega somente **dados fictícios** (nenhuma informação real
-> de pacientes, colaboradores ou fornecedores). O aviso é exibido em todas as telas.
+> de pacientes, colaboradores ou fornecedores), sinalizados de forma discreta no menu lateral e na tela
+> de login. Com `DEMO_MODE=0` esses indicadores e o acesso rápido desaparecem.
 
 ## Como executar
 
@@ -79,7 +80,13 @@ tests/                   testes automatizados da API (pytest)
 
 - **Backend:** Python + Flask + Flask-SQLAlchemy. Toda a lógica e os dados ficam no servidor (nada de
   `localStorage` como banco — ele guarda apenas a preferência de tema).
-- **Frontend:** HTML, CSS e JavaScript puro, sem etapa de build; tema claro/escuro; layout responsivo.
+- **Frontend:** HTML, CSS e JavaScript puro, sem etapa de build; layout responsivo (web e celular).
+- **Identidade visual:** baseada na marca do Hospital Rio Grande — azul-celeste `#92BFE9` com navy
+  institucional, logotipos oficiais em `app/static/img/brand/` (aplicados como máscara, assumindo a cor
+  de cada tema), títulos em sans estendida (Unbounded), rótulos em serifa espaçada como em
+  "H O S P I T A L" (Cormorant Garamond) e textos em Manrope — fontes OFL hospedadas localmente em
+  `app/static/fonts/`. **Modo claro e escuro** com alternador no topo e na tela de login (segue o
+  sistema operacional por padrão).
 - **API REST** documentada pelos próprios módulos em `app/api/` — a mesma API atende a interface web,
   futuros aplicativos móveis e integrações.
 
@@ -107,4 +114,4 @@ Os testes cobrem login dos perfis, dashboard, visibilidade por perfil, o fluxo c
 inteligência/exportação, ingestão IoT e administração de usuários.
 
 ---
-Chart.js (MIT) está incluído em `app/static/vendor/` para funcionar sem internet.
+Chart.js (MIT) e as fontes (SIL OFL) estão incluídos no projeto para funcionar sem internet.

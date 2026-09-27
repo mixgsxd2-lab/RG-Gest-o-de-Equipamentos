@@ -7,12 +7,23 @@ import {
 
 const filters = { days: 180, sector_id: "", team_id: "", maintenance_type: "" };
 
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+}
+
 export async function render(el, _params, ctx) {
   const lk = state.lookups;
   el.innerHTML = `
-    <div class="page-head">
-      <div><h1>Dashboard de Manutenção</h1><div class="sub">Visão consolidada de chamados, SLA, equipe, custos, ativos, preventivas e estoque</div></div>
-    </div>
+    <section class="hero">
+      <span class="logo-mask logo-symbol" aria-hidden="true"></span>
+      <span class="eyebrow">Hospital Rio Grande · Central de Manutenção</span>
+      <h1>${greeting()}, ${esc(state.user.name.split(" ")[0])}</h1>
+      <p>Visão consolidada de chamados, SLA, equipes, custos, ativos, preventivas, estoque e fornecedores.</p>
+      <div class="hero-meta" id="hero-meta">
+        <div>Hoje<b>${new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</b></div>
+      </div>
+    </section>
     <div class="filters" role="group" aria-label="Filtros do dashboard">
       <div class="seg" id="f-days">${[[30, "30 dias"], [90, "90 dias"], [180, "6 meses"], [365, "12 meses"]]
         .map(([d, l]) => `<button type="button" data-days="${d}" class="${filters.days == d ? "on" : ""}">${l}</button>`).join("")}</div>
@@ -31,6 +42,11 @@ export async function render(el, _params, ctx) {
   const k = d.kpis;
   const c = d.charts;
   const box = el.querySelector("#dash");
+  el.querySelector("#hero-meta").insertAdjacentHTML("beforeend", `
+    <div>Chamados ativos<b>${fmt.num(k.open + k.in_progress)}</b></div>
+    <div>SLA no período<b>${fmt.pct(k.sla_compliance)}</b></div>
+    <div>Ativos disponíveis<b>${fmt.pct(k.availability)}</b></div>
+    <div>Alertas de sensores<b>${fmt.num(k.sensors_alert)}</b></div>`);
   box.innerHTML = `
     <div class="kpis k4">
       ${kpi({ label: "Chamados abertos", value: fmt.num(k.open), foot: "Aberto + recebido", href: "#/chamados?status=aberto,recebido", dot: "var(--info)" })}

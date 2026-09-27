@@ -46,7 +46,7 @@ function base({ money = false, pct = false, legend = false, horizontal = false, 
 
 function mount(canvas, config) {
   if (!canvas || !window.Chart) return null;
-  Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  Chart.defaults.font.family = '"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif';
   const chart = new Chart(canvas, config);
   charts.add(chart);
   return chart;

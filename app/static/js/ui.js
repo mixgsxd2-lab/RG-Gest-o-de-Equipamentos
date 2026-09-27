@@ -77,6 +77,9 @@ const ICONS = {
   pause: '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>',
   key: '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
 };
+// Estrela de quatro pontas do símbolo do Hospital Rio Grande
+const SPARK = "M11.2 2h1.6v6.4a2.8 2.8 0 0 0 2.8 2.8H22v1.6h-6.4a2.8 2.8 0 0 0-2.8 2.8V22h-1.6v-6.4a2.8 2.8 0 0 0-2.8-2.8H2v-1.6h6.4a2.8 2.8 0 0 0 2.8-2.8z";
+export const sparkIcon = (cls = "") => `<svg class="icon spark ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${SPARK}"/></svg>`;
 export const icon = (name, cls = "") => `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ""}</svg>`;
 
 // ---------------------------------------------------------------- Badges
