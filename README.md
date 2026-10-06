@@ -11,6 +11,11 @@ Software de **Gestão de Manutenção Geral** do Hospital Rio Grande (RG): plata
 
 ## Como executar
 
+**Atalho (um clique):** no Windows dê duplo clique em `iniciar.bat`; no Mac/Linux rode `./iniciar.sh`.
+Ele cria o ambiente, instala as dependências, abre o navegador em http://localhost:5000 e inicia o sistema.
+
+Ou manualmente:
+
 Requisitos: Python 3.10+.
 
 ```bash
