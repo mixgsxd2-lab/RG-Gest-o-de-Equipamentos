@@ -32,7 +32,8 @@ Para recriar o banco do zero: `flask --app run init-db --reset` (ou apague a pas
 
 ### Acessos de demonstração (senha `123456`)
 
-Todos os usuários de teste abaixo aparecem com o nome **Miguel Luduvico**.
+Todos os usuários de teste abaixo aparecem com o nome **Miguel Luduvico**. A tela de login mostra atalhos só para
+`usuario`, `gestor` e `operador`, que juntos cobrem o fluxo completo do chamado; os demais continuam válidos.
 
 | Usuário     | Perfil                |
 |-------------|-----------------------|

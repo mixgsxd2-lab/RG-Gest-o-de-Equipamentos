@@ -779,7 +779,6 @@ code { background: var(--surface-3); padding: 1px 6px; border-radius: 5px; }
   .modal-back { padding: 0; }
   .modal { border-radius: 0; min-height: 100vh; }
   .modal-foot { border-radius: 0; }
-  .demo-users { grid-template-columns: 1fr 1fr; }
   .flow .step { min-width: 72px; }
   /* tabelas viram cartões */
   table.table.responsive thead { display: none; }

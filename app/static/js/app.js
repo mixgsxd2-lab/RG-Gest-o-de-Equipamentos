@@ -94,7 +94,9 @@ function hideSplash() {
 }
 
 // ------------------------------------------------------------------ Login
-const DEMO_USERS = [["admin", "Administrador"], ["gestor", "Gestor"], ["operador", "Técnico"], ["usuario", "Solicitante"], ["estoque", "Estoque"], ["diretoria", "Diretoria"]];
+// 3 perfis cobrem o fluxo completo do chamado: solicitante abre e encerra,
+// gestor recebe e designa, técnico executa e finaliza (os demais logins continuam válidos)
+const DEMO_USERS = [["usuario", "Solicitante"], ["gestor", "Gestor"], ["operador", "Técnico"]];
 
 function renderLogin() {
   destroyCharts();
