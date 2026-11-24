@@ -19,6 +19,12 @@ with app.app_context():
 
         seed_demo()
         print("Dados de DEMONSTRAÇÃO criados. Acesse com admin / 123456")
+    elif app.config["DEMO_MODE"]:
+        # bancos já existentes: padroniza o nome dos usuários de teste
+        from app.seed import DEMO_LOGINS, DEMO_NAME
+
+        User.query.filter(User.username.in_(DEMO_LOGINS)).update({"name": DEMO_NAME}, synchronize_session=False)
+        db.session.commit()
     db.session.remove()
 
 if __name__ == "__main__":

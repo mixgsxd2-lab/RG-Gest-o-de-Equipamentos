@@ -51,7 +51,7 @@ def test_dashboard_tem_dados(app):
 def test_solicitante_ve_apenas_os_proprios(app):
     client = login(app, "usuario")
     items = client.get("/api/tickets?per_page=500").get_json()["items"]
-    assert items and all(t["requester"] == "Juliana Castro" for t in items)
+    assert items and all(t["requester"] == "Miguel Luduvico" for t in items)
     assert client.get("/api/dashboard").status_code == 403
     assert client.get("/api/users").status_code == 403
 
@@ -71,14 +71,14 @@ def test_fluxo_completo_do_chamado(app):
         "files": (io.BytesIO(b"\x89PNG fake"), "foto.png")}, content_type="multipart/form-data")
     assert r.status_code == 201, r.get_json()
     t = r.get_json()
-    assert t["status"] == "aberto" and t["requester"] == "Juliana Castro" and t["sla_hours"] == 8
+    assert t["status"] == "aberto" and t["requester"] == "Miguel Luduvico" and t["sla_hours"] == 8
     assert len(t["attachments"]) == 1
     tid = t["id"]
 
     # operador não pode receber/designar; gestor recebe e designa
     assert op.post(f"/api/tickets/{tid}/actions/receive", json={}).status_code == 403
     t = gestor.post(f"/api/tickets/{tid}/actions/receive", json={}).get_json()
-    assert t["status"] == "recebido" and t["receiver"] == "Carlos Menezes"
+    assert t["status"] == "recebido" and t["receiver"] == "Miguel Luduvico"
     gestor.post(f"/api/tickets/{tid}/actions/assign", json={"technician_id": rafael["id"]})
 
     t = op.post(f"/api/tickets/{tid}/actions/accept", json={}).get_json()

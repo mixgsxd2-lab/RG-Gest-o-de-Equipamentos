@@ -7,11 +7,6 @@ import {
 
 const filters = { days: 180, sector_id: "", team_id: "", maintenance_type: "" };
 
-function greeting() {
-  const h = new Date().getHours();
-  return h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
-}
-
 export async function render(el, _params, ctx) {
   const lk = state.lookups;
   el.innerHTML = `
@@ -20,40 +15,30 @@ export async function render(el, _params, ctx) {
         <span class="eyebrow">Central de manutenção</span>
         <span class="eyebrow">${new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</span>
       </div>
-      <h1>${greeting()}, <b>${esc(state.user.name.split(" ")[0])}</b></h1>
-      <div class="hero-meta" id="hero-meta"></div>
+      <h1>Bem-vindo, <b>${esc(state.user.name)}</b></h1>
     </section>
     <div class="filters" role="group" aria-label="Filtros do dashboard">
       <div class="seg" id="f-days">${[[30, "30 dias"], [90, "90 dias"], [180, "6 meses"], [365, "12 meses"]]
         .map(([d, l]) => `<button type="button" data-days="${d}" class="${filters.days == d ? "on" : ""}">${l}</button>`).join("")}</div>
       <select id="f-sector" aria-label="Setor">${options(lk.sectors, filters.sector_id, { empty: "Todos os setores" })}</select>
-      <select id="f-team" aria-label="Equipe">${options(lk.teams, filters.team_id, { empty: "Todas as equipes" })}</select>
-      <select id="f-type" aria-label="Tipo de manutenção">${options(lk.maintenance_types, filters.maintenance_type, { empty: "Todos os tipos" })}</select>
     </div>
     <div id="dash">${loading()}</div>`;
 
   el.querySelectorAll("#f-days button").forEach((b) => b.addEventListener("click", () => { filters.days = b.dataset.days; render(el, _params, ctx); }));
   const bind = (id, key) => el.querySelector(id).addEventListener("change", (e) => { filters[key] = e.target.value; render(el, _params, ctx); });
-  bind("#f-sector", "sector_id"); bind("#f-team", "team_id"); bind("#f-type", "maintenance_type");
+  bind("#f-sector", "sector_id");
 
   const d = await api.get("/api/dashboard", filters);
   if (!ctx.isCurrent()) return;
   const k = d.kpis;
   const c = d.charts;
   const box = el.querySelector("#dash");
-  el.querySelector("#hero-meta").insertAdjacentHTML("beforeend", `
-    <div>Chamados ativos<b>${fmt.num(k.open + k.in_progress)}</b></div>
-    <div>Alertas de sensores<b>${fmt.num(k.sensors_alert)}</b></div>`);
   box.innerHTML = `
     <div class="kpis k4">
       ${kpi({ label: "Chamados abertos", value: fmt.num(k.open), href: "#/chamados?status=aberto,recebido", dot: "var(--info)" })}
       ${kpi({ label: "Em andamento", value: fmt.num(k.in_progress), foot: `${k.waiting} aguardando`, href: "#/chamados?status=aceito,em_execucao,aguardando", dot: "var(--warning)" })}
-      ${kpi({ label: "Finalizados", value: fmt.num(k.finished), foot: `de ${fmt.num(k.total)} no período`, href: "#/chamados?status=finalizado,encerrado", dot: "var(--good)" })}
-      ${kpi({ label: "SLA cumprido", value: fmt.pct(k.sla_compliance), foot: `${k.sla_violated_open} violados · ${k.sla_at_risk} em risco`, href: "#/chamados?sla=violado" })}
-      ${kpi({ label: "Tempo médio", value: fmt.hours(k.avg_resolution_hours), foot: `Resposta: ${fmt.hours(k.avg_response_hours)}` })}
-      ${kpi({ label: "Custo total", value: fmt.moneyShort(k.total_cost), foot: `${fmt.money(k.avg_cost_per_ticket)} por chamado`, href: "#/custos" })}
-      ${kpi({ label: "Disponibilidade", value: fmt.pct(k.availability), foot: `${k.assets_down} de ${k.assets_total} parados`, href: "#/ativos" })}
-      ${kpi({ label: "Preventivas", value: fmt.pct(d.preventive.compliance), foot: `${d.preventive.overdue} atrasadas · ${d.preventive.next_7_days} em 7 dias`, href: "#/preventivas" })}
+      ${kpi({ label: "SLA cumprido", value: fmt.pct(k.sla_compliance), foot: `${k.sla_violated_open} violados`, href: "#/chamados?sla=violado" })}
+      ${kpi({ label: "Custo total", value: fmt.moneyShort(k.total_cost), href: "#/custos" })}
     </div>
 
     <div class="grid grid-3">

@@ -36,6 +36,42 @@ const NAV = [
 
 let alertsCache = [];
 
+// ------------------------------------------------------------------ Tema claro/escuro
+function isDark() {
+  const t = document.documentElement.dataset.theme;
+  if (t) return t === "dark";
+  return !window.matchMedia("(prefers-color-scheme: light)").matches;
+}
+
+function themeSwitch() {
+  const dark = isDark();
+  return `<div class="theme-switch" role="group" aria-label="Tema da interface">
+    <button type="button" data-theme-set="light" class="${dark ? "" : "on"}" aria-pressed="${!dark}" title="Modo claro">${icon("sun")}</button>
+    <button type="button" data-theme-set="dark" class="${dark ? "on" : ""}" aria-pressed="${dark}" title="Modo escuro">${icon("moon")}</button>
+  </div>`;
+}
+
+function bindThemeSwitch(scope, after) {
+  scope.querySelectorAll("[data-theme-set]").forEach((b) => b.addEventListener("click", () => {
+    const next = b.dataset.themeSet;
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("rg-theme", next); } catch (e) { /* armazenamento indisponível */ }
+    scope.querySelectorAll("[data-theme-set]").forEach((x) => {
+      x.classList.toggle("on", x.dataset.themeSet === next);
+      x.setAttribute("aria-pressed", x.dataset.themeSet === next);
+    });
+    if (after) after();
+  }));
+}
+
+// ------------------------------------------------------------------ Tela de carregamento
+const splashStart = Date.now();
+function hideSplash() {
+  const el = document.getElementById("splash");
+  if (!el) return;
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 500); }, Math.max(0, 900 - (Date.now() - splashStart)));
+}
+
 // ------------------------------------------------------------------ Login
 const DEMO_USERS = [["admin", "Administrador"], ["gestor", "Gestor"], ["operador", "Técnico"], ["usuario", "Solicitante"], ["estoque", "Estoque"], ["diretoria", "Diretoria"]];
 
@@ -47,8 +83,7 @@ function renderLogin() {
     <section class="login-panel glass">
       <div class="login-top">
         <span class="eyebrow">Engenharia &amp; Manutenção</span>
-        <span class="eyebrow hide-sm">Hospital Rio Grande</span>
-        <span class="eyebrow">Acesso restrito</span>
+        ${themeSwitch()}
       </div>
       <div class="login-grid">
         <div class="login-hero">
@@ -64,17 +99,14 @@ function renderLogin() {
             ])}
             <button class="btn primary" type="submit">Entrar</button>
           </div>
-          ${demo ? `<div class="divider">Demonstração · senha 123456</div>
+          ${demo ? `<div class="divider">Acesso de teste · senha 123456</div>
           <div class="demo-users">${DEMO_USERS.map(([u, r]) => `<button type="button" data-user="${u}"><b>${u}</b><span>${r}</span></button>`).join("")}</div>` : ""}
         </form>
       </div>
-      <div class="login-bottom">
-        <span class="eyebrow">Chamados · Ativos · Preventivas</span>
-        <span class="pill">Central de manutenção</span>
-        <span class="eyebrow hide-sm">Equipes · Estoque · Custos</span>
-      </div>
     </section>
   </div>`;
+  bindThemeSwitch(root);
+  hideSplash();
   const form = document.getElementById("login-form");
   const submit = async () => {
     try {
@@ -96,33 +128,33 @@ function renderLogin() {
 // ------------------------------------------------------------------ Layout
 function renderShell() {
   const u = state.user;
-  const demo = document.body.dataset.demo === "1";
+  let collapsed = false;
+  try { collapsed = localStorage.getItem("rg-sidebar") === "closed"; } catch (e) { /* sem armazenamento */ }
   const nav = NAV.filter((n) => n.section || can(n.perm));
   // remove seções vazias
   const cleaned = nav.filter((n, i) => !n.section || (nav[i + 1] && !nav[i + 1].section));
   root.innerHTML = `
-  <div class="app">
+  <div class="app${collapsed ? " collapsed" : ""}" id="app">
     <aside class="sidebar" id="sidebar">
-      <a class="brand" href="#/" aria-label="Hospital Rio Grande — início">
-        <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
-        <div class="brand-sub">Engenharia &amp; Manutenção</div>
-      </a>
+      <div class="brand-row">
+        <a class="brand" href="#/" aria-label="Hospital Rio Grande — início">
+          <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
+          <span class="logo-mask logo-symbol" aria-hidden="true"></span>
+        </a>
+        <button class="icon-btn collapse-btn" id="collapse-btn" aria-label="Recolher menu" aria-expanded="${!collapsed}" title="Abrir/fechar menu">${icon("sidebar")}</button>
+      </div>
       <nav class="nav" aria-label="Menu principal">
         ${cleaned.map((n) => n.section ? `<div class="nav-section">${n.section}</div>`
-          : `<a href="#/${n.path}" data-path="${n.path}">${icon(n.icon)}<span>${n.label}</span>${n.badge ? '<span class="badge-count hidden" data-badge="' + n.badge + '"></span>' : ""}</a>`).join("")}
+          : `<a href="#/${n.path}" data-path="${n.path}" title="${n.label}">${icon(n.icon)}<span>${n.label}</span>${n.badge ? '<span class="badge-count hidden" data-badge="' + n.badge + '"></span>' : ""}</a>`).join("")}
       </nav>
-      <div class="sidebar-foot">
-        ${demo ? '<span class="demo-chip">Demonstração · dados fictícios</span>' : ""}
-        <span>© Hospital Rio Grande</span>
-      </div>
     </aside>
     <div class="main">
       <header class="topbar">
         <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Abrir menu">${icon("menu")}</button>
         <span class="logo-mask logo-symbol" aria-hidden="true"></span>
-        <div class="title" id="page-title"></div>
         <div class="spacer"></div>
         ${can("tickets.create") ? `<a class="btn primary sm" href="#/chamados/novo">${icon("plus")}<span class="hide-sm">Novo chamado</span></a>` : ""}
+        ${themeSwitch()}
         <button class="icon-btn" id="alerts-btn" aria-label="Alertas">${icon("bell")}<span class="dot hidden" id="alerts-dot"></span></button>
         <button class="user-chip" id="user-btn" aria-label="Menu do usuário">
           <span class="avatar">${esc(initials(u.name))}</span>
@@ -143,6 +175,16 @@ function renderShell() {
     document.body.appendChild(scrim);
   });
   sidebar.addEventListener("click", (e) => { if (e.target.closest("a")) closeMenu(); });
+  const collapseBtn = document.getElementById("collapse-btn");
+  collapseBtn.addEventListener("click", () => {
+    const app = document.getElementById("app");
+    const closed = app.classList.toggle("collapsed");
+    collapseBtn.setAttribute("aria-expanded", String(!closed));
+    collapseBtn.setAttribute("aria-label", closed ? "Abrir menu" : "Recolher menu");
+    try { localStorage.setItem("rg-sidebar", closed ? "closed" : "open"); } catch (e) { /* sem armazenamento */ }
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 260); // reajusta os gráficos
+  });
+  bindThemeSwitch(document.querySelector(".topbar"), () => route()); // redesenha gráficos com as cores do tema
   document.getElementById("alerts-btn").addEventListener("click", (e) => { e.stopPropagation(); showAlerts(); });
   document.getElementById("user-btn").addEventListener("click", (e) => { e.stopPropagation(); showUserMenu(); });
   document.addEventListener("click", (e) => {
@@ -262,6 +304,7 @@ async function startApp() {
   state.lookups = await api.get("/api/lookups");
   renderShell();
   await route();
+  hideSplash();
   refreshAlerts();
 }
 

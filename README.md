@@ -32,6 +32,8 @@ Para recriar o banco do zero: `flask --app run init-db --reset` (ou apague a pas
 
 ### Acessos de demonstração (senha `123456`)
 
+Todos os usuários de teste abaixo aparecem com o nome **Miguel Luduvico**.
+
 | Usuário     | Perfil                |
 |-------------|-----------------------|
 | `admin`     | Administrador         |
@@ -86,9 +88,9 @@ tests/                   testes automatizados da API (pytest)
 - **Backend:** Python + Flask + Flask-SQLAlchemy. Toda a lógica e os dados ficam no servidor (nada de
   `localStorage` como banco — ele guarda apenas a preferência de tema).
 - **Frontend:** HTML, CSS e JavaScript puro, sem etapa de build; layout responsivo (web e celular).
-- **Identidade visual:** glassmorphism azul em estilo Apple — fundo azul profundo com luzes desfocadas,
-  painéis de vidro fosco (`backdrop-filter`), tipografia do sistema (SF Pro / Inter / Manrope local) e
-  rótulos pequenos em caixa-alta. Logotipos oficiais em `app/static/img/brand/`, aplicados como máscara.
+- **Identidade visual:** glassmorphism cinza em estilo Apple, com **modo claro e escuro** (segue o
+  sistema; alternador no topo e no login), barra lateral recolhível (fechada mostra só os ícones) e tela
+  de carregamento azul-escura. Logotipos oficiais em `app/static/img/brand/`, aplicados como máscara.
 - **API REST** documentada pelos próprios módulos em `app/api/` — a mesma API atende a interface web,
   futuros aplicativos móveis e integrações.
 

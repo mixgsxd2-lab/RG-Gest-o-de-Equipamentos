@@ -60,14 +60,18 @@ SUPPLIERS = [
      "Fábio Teles", 4.4),
 ]
 
+# nome exibido para todos os usuários de teste do acesso rápido
+DEMO_NAME = "Miguel Luduvico"
+DEMO_LOGINS = ("admin", "gestor", "operador", "usuario", "estoque", "diretoria")
+
 USERS = [
     # username, nome, perfil, setor, equipe
-    ("admin", "Administrador do Sistema", "admin", "Administração", None),
-    ("gestor", "Carlos Menezes", "gestor", "Utilidades / Casa de Máquinas", None),
-    ("operador", "Rafael Souza", "operador", "Utilidades / Casa de Máquinas", "Engenharia Clínica"),
-    ("usuario", "Juliana Castro", "solicitante", "UTI Adulto", None),
-    ("estoque", "Marcos Lima", "estoque", "Utilidades / Casa de Máquinas", None),
-    ("diretoria", "Helena Prado", "diretoria", "Administração", None),
+    ("admin", DEMO_NAME, "admin", "Administração", None),
+    ("gestor", DEMO_NAME, "gestor", "Utilidades / Casa de Máquinas", None),
+    ("operador", DEMO_NAME, "operador", "Utilidades / Casa de Máquinas", "Engenharia Clínica"),
+    ("usuario", DEMO_NAME, "solicitante", "UTI Adulto", None),
+    ("estoque", DEMO_NAME, "estoque", "Utilidades / Casa de Máquinas", None),
+    ("diretoria", DEMO_NAME, "diretoria", "Administração", None),
     ("tecnico.eletrica", "Bruno Carvalho", "operador", "Utilidades / Casa de Máquinas", "Elétrica"),
     ("tecnico.predial", "Sérgio Nunes", "operador", "Utilidades / Casa de Máquinas", "Manutenção Predial"),
     ("tecnico.clima", "Diego Farias", "operador", "Utilidades / Casa de Máquinas", "Climatização"),
