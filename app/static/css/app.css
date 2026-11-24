@@ -354,15 +354,15 @@ svg.spark { fill: currentColor; stroke: none; }
   background: var(--sidebar); border: 1px solid var(--sidebar-border); box-shadow: var(--shadow), var(--glass-hi);
   -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); color: var(--sidebar-text);
   display: flex; flex-direction: column; position: sticky; top: 14px; overflow-y: auto; z-index: 40; }
-.brand { display: block; padding: 24px 22px 14px; text-decoration: none; }
+.brand { display: block; padding: 20px 22px 12px; text-decoration: none; }
 .brand:hover { text-decoration: none; }
 .brand .logo-wordmark { width: 178px; }
 .brand-sub { margin-top: 10px; font-weight: 500; font-size: .64rem; white-space: nowrap;
   letter-spacing: .16em; text-transform: uppercase; color: var(--sidebar-muted); }
-.nav { padding: 4px 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.nav { padding: 0 12px 14px; display: flex; flex-direction: column; gap: 1px; }
 .nav-section { font-weight: 500; font-size: .64rem; text-transform: uppercase;
   letter-spacing: .16em; color: var(--sidebar-muted); padding: 16px 12px 6px; }
-.nav a { display: flex; align-items: center; gap: 11px; white-space: nowrap; color: var(--sidebar-text); padding: 9px 12px;
+.nav a { display: flex; align-items: center; gap: 11px; white-space: nowrap; color: var(--sidebar-text); padding: 8px 12px;
   border-radius: 12px; font-size: .88rem; font-weight: 500; text-decoration: none; position: relative;
   transition: background .15s, color .15s; }
 .nav a:hover { background: var(--sidebar-hover); color: var(--text); }
@@ -400,7 +400,10 @@ svg.spark { fill: currentColor; stroke: none; }
 
 /* Barra lateral: aberta por padrão; o botão do rodapé recolhe para só os ícones */
 .brand .logo-symbol { width: 30px; display: none; }
-.sidebar-foot { margin-top: auto; padding: 10px 12px 14px; border-top: 1px solid var(--sidebar-border); }
+.sidebar-top { padding: 0 12px 6px; }
+.nav-divider { height: 1px; margin: 6px 12px; background: var(--sidebar-border); }
+.sidebar { scrollbar-width: none; }
+.sidebar::-webkit-scrollbar { display: none; }
 .collapse-btn { width: 100%; display: flex; align-items: center; gap: 11px; padding: 10px 12px; min-height: 44px;
   border: 0; border-radius: 12px; background: transparent; color: var(--sidebar-text); font: inherit; font-size: .85rem;
   font-weight: 500; cursor: pointer; white-space: nowrap; }
@@ -408,13 +411,12 @@ svg.spark { fill: currentColor; stroke: none; }
 .collapse-btn svg.icon { transition: transform .25s ease; }
 @media (min-width: 1025px) {
   .app.collapsed { grid-template-columns: 84px 1fr; }
-  .app.collapsed .brand { padding: 22px 0 12px; display: grid; place-items: center; }
+  .app.collapsed .brand { display: grid; place-items: center; }
   .app.collapsed .brand .logo-wordmark { display: none; }
   .app.collapsed .brand .logo-symbol { display: block; }
-  .app.collapsed .nav { padding: 4px 12px 16px; }
-  .app.collapsed .nav-section { font-size: 0; padding: 8px 0; }
-  .app.collapsed .nav-section::after { content: ""; display: block; height: 1px; margin: 0 10px; background: var(--sidebar-border); }
-  .app.collapsed .nav a { justify-content: center; padding: 12px 0; }
+  .app.collapsed .brand { padding: 20px 0 12px; }
+  .app.collapsed .nav-divider { margin: 6px 10px; }
+  .app.collapsed .nav a { justify-content: center; padding: 10px 0; }
   .app.collapsed .nav a > span:not(.badge-count) { display: none; }
   /* fechada: contador vira um pontinho de alerta */
   .app.collapsed .nav .badge-count { position: absolute; top: 8px; left: calc(50% - 14px); width: 8px; height: 8px; min-width: 0;
@@ -732,7 +734,7 @@ code { background: var(--surface-3); padding: 1px 6px; border-radius: 5px; }
 }
 @media (max-width: 1024px) {
   .app { grid-template-columns: 1fr; }
-  .sidebar-foot { display: none; }
+  .sidebar-top { display: none; }
   .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 270px; height: auto; transform: translateX(-110%);
     transition: transform .22s ease; box-shadow: var(--shadow-lg); background: var(--overlay); }
   .sidebar.open { transform: none; }

@@ -68,7 +68,7 @@ function bindThemeSwitch(scope, after) {
 }
 
 // ------------------------------------------------------------------ Tela de carregamento (ao entrar e ao sair)
-let splashShownAt = 0;
+let splashShownAt = Date.now(); // a tela já vem no HTML ao abrir/recarregar
 function showSplash(text) {
   let el = document.getElementById("splash");
   if (!el) {
@@ -163,15 +163,15 @@ function renderShell() {
         <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
         <span class="logo-mask logo-symbol" aria-hidden="true"></span>
       </a>
-      <nav class="nav" aria-label="Menu principal">
-        ${cleaned.map((n) => n.section ? `<div class="nav-section">${n.section}</div>`
-          : `<a href="#/${n.path}" data-path="${n.path}" title="${n.label}">${icon(n.icon)}<span>${n.label}</span>${n.badge ? '<span class="badge-count hidden" data-badge="' + n.badge + '"></span>' : ""}</a>`).join("")}
-      </nav>
-      <div class="sidebar-foot">
+      <div class="sidebar-top">
         <button type="button" class="collapse-btn" id="collapse-btn" aria-expanded="${!collapsed}" title="${collapsed ? "Abrir menu" : "Recolher menu"}">
           ${icon("sidebar")}<span>Recolher menu</span>
         </button>
       </div>
+      <nav class="nav" aria-label="Menu principal">
+        ${cleaned.map((n, i) => n.section ? (i ? '<div class="nav-divider" role="separator"></div>' : "")
+          : `<a href="#/${n.path}" data-path="${n.path}" title="${n.label}">${icon(n.icon)}<span>${n.label}</span>${n.badge ? '<span class="badge-count hidden" data-badge="' + n.badge + '"></span>' : ""}</a>`).join("")}
+      </nav>
     </aside>
     <div class="main">
       <header class="topbar">
@@ -356,4 +356,5 @@ setInterval(() => { if (state.user) refreshAlerts(); }, 60000);
   } catch (e) {
     renderLogin();
   }
+  hideSplash();
 })();
