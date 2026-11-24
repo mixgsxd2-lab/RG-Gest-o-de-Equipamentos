@@ -96,7 +96,7 @@ function renderNew(el) {
   el.innerHTML = `
     <div class="page-head">
       <div><a href="#/chamados" class="muted small">${icon("back")} Chamados</a><h1 style="margin-top:4px">Abrir chamado</h1>
-      <div class="sub">Descreva o problema e escolha o setor de manutenção que deve atender</div></div>
+      <div class="sub">Descreva o problema e o setor que deve atender</div></div>
     </div>
     <form class="card" id="new-form" novalidate>
       <div class="card-body">

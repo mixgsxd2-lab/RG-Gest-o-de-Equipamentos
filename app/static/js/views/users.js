@@ -14,7 +14,7 @@ const PERM_LABELS = {
 export async function render(el, _params, ctx) {
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Usuários e acessos</h1><div class="sub">Perfis, permissões e integrações de identidade corporativa</div></div>
+      <div><h1>Usuários e acessos</h1><div class="sub">Perfis e permissões</div></div>
       <div class="actions"><button class="btn primary" id="new">${icon("plus")} Novo usuário</button></div>
     </div>
     <div class="tabs">${[["usuarios", "Usuários"], ["perfis", "Perfis e permissões"], ["integracoes", "Integrações"]]

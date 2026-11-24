@@ -13,7 +13,7 @@ export async function render(el, params, ctx) {
   if (!ctx.isCurrent()) return;
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Inventário de ativos</h1><div class="sub">Equipamentos médicos, instalações e estruturas com vida útil, depreciação e histórico</div></div>
+      <div><h1>Inventário de ativos</h1><div class="sub">Equipamentos, instalações e histórico</div></div>
       <div class="actions">${can("indicators.view") ? `<a class="btn" href="/api/intelligence/export/ativos.csv">${icon("download")} Exportar CSV</a>` : ""}
       ${can("assets.edit") ? `<button class="btn primary" id="new">${icon("plus")} Novo ativo</button>` : ""}</div>
     </div>

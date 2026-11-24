@@ -8,7 +8,7 @@ export async function render(el, _params, ctx) {
   const lk = state.lookups;
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Custos da manutenção</h1><div class="sub">Materiais, mão de obra, terceiros, contratos e investimentos — lançamentos de chamados são automáticos</div></div>
+      <div><h1>Custos da manutenção</h1><div class="sub">Materiais, mão de obra, terceiros e contratos</div></div>
       <div class="actions">${can("indicators.view") ? `<a class="btn" href="/api/intelligence/export/custos.csv">${icon("download")} Exportar CSV</a>` : ""}
         ${can("costs.edit") ? `<button class="btn primary" id="new">${icon("plus")} Novo lançamento</button>` : ""}</div>
     </div>

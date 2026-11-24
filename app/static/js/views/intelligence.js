@@ -15,7 +15,7 @@ const DATASETS = {
 export async function render(el, _params, ctx) {
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Indicadores e inteligência</h1><div class="sub">Análise de falhas, depreciação, apoio à decisão e dados para BI / Big Data / ML</div></div>
+      <div><h1>Indicadores</h1><div class="sub">Falhas, depreciação e exportação de dados</div></div>
     </div>
     <div class="tabs">${[["falhas", "Análise de falhas"], ["depreciacao", "Depreciação de ativos"], ["decisao", "Apoio à decisão"], ["bi", "BI e exportação de dados"]]
       .map(([k, l]) => `<button type="button" data-tab="${k}" class="${view.tab === k ? "on" : ""}">${l}</button>`).join("")}</div>

@@ -7,7 +7,7 @@ const view = { tab: "desempenho", days: 180 };
 export async function render(el, _params, ctx) {
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Fornecedores e contratos</h1><div class="sub">Terceiros, contratos de manutenção, SLA contratual e desempenho</div></div>
+      <div><h1>Fornecedores e contratos</h1><div class="sub">Contratos, SLA e desempenho</div></div>
       <div class="actions">${can("teams.edit") ? `<button class="btn" id="new-sup">${icon("plus")} Fornecedor</button><button class="btn primary" id="new-ct">${icon("plus")} Contrato</button>` : ""}</div>
     </div>
     <div class="tabs">${[["desempenho", "Desempenho"], ["contratos", "Contratos"], ["fornecedores", "Fornecedores"]]

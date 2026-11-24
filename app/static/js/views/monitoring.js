@@ -8,7 +8,7 @@ const view = { tab: "sensores", sensor: null, hours: 24, kind: "" };
 export async function render(el, _params, ctx) {
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Monitoramento e manutenção preditiva</h1><div class="sub">Sensores de energia, água, gases medicinais e condição de equipamentos · base para IoT e Machine Learning</div></div>
+      <div><h1>Monitoramento</h1><div class="sub">Energia, água, gases e equipamentos</div></div>
       <div class="actions">${can("iot.edit") ? `<button class="btn" id="new">${icon("plus")} Novo sensor</button>` : ""}</div>
     </div>
     <div class="tabs">${[["sensores", "Sensores / IoT"], ["preditiva", "Risco preditivo"], ["integracao", "Integração"]]

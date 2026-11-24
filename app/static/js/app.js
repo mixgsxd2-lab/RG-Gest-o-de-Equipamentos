@@ -1,7 +1,7 @@
 // Aplicação SPA: autenticação, layout, navegação e roteamento
 import { api } from "./api.js";
 import { destroyCharts } from "./charts.js";
-import { can, esc, formFields, icon, initials, modal, sparkIcon, state, toast } from "./ui.js";
+import { can, esc, formFields, icon, initials, modal, state, toast } from "./ui.js";
 
 import * as dashboard from "./views/dashboard.js";
 import * as tickets from "./views/tickets.js";
@@ -36,34 +36,6 @@ const NAV = [
 
 let alertsCache = [];
 
-// ------------------------------------------------------------------ Tema claro/escuro
-function isDark() {
-  const t = document.documentElement.dataset.theme;
-  if (t) return t === "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
-function themeSwitch() {
-  const dark = isDark();
-  return `<div class="theme-switch" role="group" aria-label="Tema da interface">
-    <button type="button" data-theme-set="light" class="${dark ? "" : "on"}" aria-pressed="${!dark}" title="Modo claro">${icon("sun")}</button>
-    <button type="button" data-theme-set="dark" class="${dark ? "on" : ""}" aria-pressed="${dark}" title="Modo escuro">${icon("moon")}</button>
-  </div>`;
-}
-
-function bindThemeSwitch(scope, after) {
-  scope.querySelectorAll("[data-theme-set]").forEach((b) => b.addEventListener("click", () => {
-    const next = b.dataset.themeSet;
-    document.documentElement.dataset.theme = next;
-    try { localStorage.setItem("rg-theme", next); } catch (e) { /* armazenamento indisponível */ }
-    scope.querySelectorAll("[data-theme-set]").forEach((x) => {
-      x.classList.toggle("on", x.dataset.themeSet === next);
-      x.setAttribute("aria-pressed", x.dataset.themeSet === next);
-    });
-    if (after) after();
-  }));
-}
-
 // ------------------------------------------------------------------ Login
 const DEMO_USERS = [["admin", "Administrador"], ["gestor", "Gestor"], ["operador", "Técnico"], ["usuario", "Solicitante"], ["estoque", "Estoque"], ["diretoria", "Diretoria"]];
 
@@ -72,41 +44,37 @@ function renderLogin() {
   const demo = document.body.dataset.demo === "1";
   root.innerHTML = `
   <div class="login-page">
-    <section class="login-hero">
-      <span class="logo-mask logo-wordmark" role="img" aria-label="Hospital Rio Grande"></span>
-      <span class="logo-mask logo-symbol watermark" aria-hidden="true"></span>
-      <div class="headline">
+    <section class="login-panel glass">
+      <div class="login-top">
         <span class="eyebrow">Engenharia &amp; Manutenção</span>
-        <h1>A infraestrutura que sustenta cada atendimento.</h1>
-        <p>Plataforma central de manutenção do Hospital Rio Grande: chamados, ativos, preventivas, equipes, estoque, custos e indicadores em um só lugar.</p>
-      </div>
-      <div class="login-pillars">
-        <div><b>${sparkIcon()} Chamados com SLA</b>Fluxo completo, do pedido ao encerramento, com histórico auditável.</div>
-        <div><b>${sparkIcon()} Ativos e preventivas</b>Inventário, depreciação, calibrações e calendário de manutenção.</div>
-        <div><b>${sparkIcon()} Utilidades monitoradas</b>Energia, água e gases medicinais prontos para IoT.</div>
-        <div><b>${sparkIcon()} Decisão baseada em dados</b>Custos, falhas, desempenho de terceiros e BI.</div>
-      </div>
-    </section>
-    <section class="login-form-wrap">
-      ${themeSwitch()}
-      <form class="login-card card" id="login-form">
+        <span class="eyebrow hide-sm">Hospital Rio Grande</span>
         <span class="eyebrow">Acesso restrito</span>
-        <h2>Entrar na plataforma</h2>
-        <p class="muted small" style="margin-bottom:18px">Use suas credenciais institucionais.</p>
-        <div class="stack" style="gap:14px">
-          ${formFields([
-            { name: "username", label: "Usuário", required: true, attrs: 'autocomplete="username" autocapitalize="none"' },
-            { name: "password", label: "Senha", type: "password", required: true, attrs: 'autocomplete="current-password"' },
-          ])}
-          <button class="btn primary" type="submit" style="width:100%;padding:11px">Entrar</button>
+      </div>
+      <div class="login-grid">
+        <div class="login-hero">
+          <span class="logo-mask logo-wordmark" role="img" aria-label="Hospital Rio Grande"></span>
+          <h1>Gestão de<b>Manutenção</b></h1>
         </div>
-        ${demo ? `<div class="divider">Acesso rápido · demonstração (senha 123456)</div>
-        <div class="demo-users">${DEMO_USERS.map(([u, r]) => `<button type="button" data-user="${u}"><b>${u}</b><span>${r}</span></button>`).join("")}</div>` : ""}
-        <p class="muted small" style="margin-top:18px">Preparado para login corporativo: Active Directory, Microsoft 365 e Google Workspace.</p>
-      </form>
+        <form class="login-card" id="login-form">
+          <h2>Entrar</h2>
+          <div class="stack" style="gap:14px">
+            ${formFields([
+              { name: "username", label: "Usuário", required: true, attrs: 'autocomplete="username" autocapitalize="none"' },
+              { name: "password", label: "Senha", type: "password", required: true, attrs: 'autocomplete="current-password"' },
+            ])}
+            <button class="btn primary" type="submit">Entrar</button>
+          </div>
+          ${demo ? `<div class="divider">Demonstração · senha 123456</div>
+          <div class="demo-users">${DEMO_USERS.map(([u, r]) => `<button type="button" data-user="${u}"><b>${u}</b><span>${r}</span></button>`).join("")}</div>` : ""}
+        </form>
+      </div>
+      <div class="login-bottom">
+        <span class="eyebrow">Chamados · Ativos · Preventivas</span>
+        <span class="pill">Central de manutenção</span>
+        <span class="eyebrow hide-sm">Equipes · Estoque · Custos</span>
+      </div>
     </section>
   </div>`;
-  bindThemeSwitch(root);
   const form = document.getElementById("login-form");
   const submit = async () => {
     try {
@@ -155,7 +123,6 @@ function renderShell() {
         <div class="title" id="page-title"></div>
         <div class="spacer"></div>
         ${can("tickets.create") ? `<a class="btn primary sm" href="#/chamados/novo">${icon("plus")}<span class="hide-sm">Novo chamado</span></a>` : ""}
-        ${themeSwitch()}
         <button class="icon-btn" id="alerts-btn" aria-label="Alertas">${icon("bell")}<span class="dot hidden" id="alerts-dot"></span></button>
         <button class="user-chip" id="user-btn" aria-label="Menu do usuário">
           <span class="avatar">${esc(initials(u.name))}</span>
@@ -176,7 +143,6 @@ function renderShell() {
     document.body.appendChild(scrim);
   });
   sidebar.addEventListener("click", (e) => { if (e.target.closest("a")) closeMenu(); });
-  bindThemeSwitch(document.querySelector(".topbar"), () => route()); // redesenha gráficos com as cores do tema
   document.getElementById("alerts-btn").addEventListener("click", (e) => { e.stopPropagation(); showAlerts(); });
   document.getElementById("user-btn").addEventListener("click", (e) => { e.stopPropagation(); showUserMenu(); });
   document.addEventListener("click", (e) => {

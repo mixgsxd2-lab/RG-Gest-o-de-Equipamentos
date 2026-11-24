@@ -86,12 +86,9 @@ tests/                   testes automatizados da API (pytest)
 - **Backend:** Python + Flask + Flask-SQLAlchemy. Toda a lógica e os dados ficam no servidor (nada de
   `localStorage` como banco — ele guarda apenas a preferência de tema).
 - **Frontend:** HTML, CSS e JavaScript puro, sem etapa de build; layout responsivo (web e celular).
-- **Identidade visual:** baseada na marca do Hospital Rio Grande — azul-celeste `#92BFE9` com navy
-  institucional, logotipos oficiais em `app/static/img/brand/` (aplicados como máscara, assumindo a cor
-  de cada tema), títulos em sans estendida (Unbounded), rótulos em serifa espaçada como em
-  "H O S P I T A L" (Cormorant Garamond) e textos em Manrope — fontes OFL hospedadas localmente em
-  `app/static/fonts/`. **Modo claro e escuro** com alternador no topo e na tela de login (segue o
-  sistema operacional por padrão).
+- **Identidade visual:** glassmorphism azul em estilo Apple — fundo azul profundo com luzes desfocadas,
+  painéis de vidro fosco (`backdrop-filter`), tipografia do sistema (SF Pro / Inter / Manrope local) e
+  rótulos pequenos em caixa-alta. Logotipos oficiais em `app/static/img/brand/`, aplicados como máscara.
 - **API REST** documentada pelos próprios módulos em `app/api/` — a mesma API atende a interface web,
   futuros aplicativos móveis e integrações.
 

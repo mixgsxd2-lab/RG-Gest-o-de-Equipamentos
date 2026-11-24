@@ -10,7 +10,7 @@ export async function render(el, _params, ctx) {
   if (!view.month) { const n = new Date(); view.month = new Date(n.getFullYear(), n.getMonth(), 1); }
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Manutenção preventiva</h1><div class="sub">Calendário, planos periódicos, calibrações, inspeções e geração de ordens de serviço</div></div>
+      <div><h1>Manutenção preventiva</h1><div class="sub">Calendário e planos periódicos</div></div>
       <div class="actions">${can("preventive.edit") ? `<button class="btn primary" id="new">${icon("plus")} Novo plano</button>` : ""}</div>
     </div>
     <div id="body">${loading()}</div>`;

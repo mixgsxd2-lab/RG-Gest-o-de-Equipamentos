@@ -35,7 +35,7 @@ function base({ money = false, pct = false, legend = false, horizontal = false, 
       legend: { display: legend, position: "top", align: "start",
         labels: { color: css("--text-2"), usePointStyle: true, pointStyle: "rectRounded", boxWidth: 10, boxHeight: 10, padding: 14, font: { size: 12 } } },
       tooltip: {
-        backgroundColor: css("--surface"), titleColor: css("--text"), bodyColor: css("--text-2"),
+        backgroundColor: css("--surface-solid"), titleColor: css("--text"), bodyColor: css("--text-2"),
         borderColor: css("--border-strong"), borderWidth: 1, padding: 10, boxPadding: 4, usePointStyle: true,
         callbacks: { label: (ctx) => ` ${ctx.dataset.label ? ctx.dataset.label + ": " : ""}${ctx.parsed[horizontal ? "x" : "y"] === null ? "—" : money ? fmt.money(ctx.parsed[horizontal ? "x" : "y"]) : pct ? fmt.pct(ctx.parsed[horizontal ? "x" : "y"]) : fmt.num(ctx.parsed[horizontal ? "x" : "y"])}` },
       },

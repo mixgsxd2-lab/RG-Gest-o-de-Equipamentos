@@ -7,7 +7,7 @@ const KIND = { entrada: ["b-good", "Entrada"], saida: ["b-serious", "Saída"], a
 export async function render(el, _params, ctx) {
   el.innerHTML = `
     <div class="page-head">
-      <div><h1>Estoque de peças e materiais</h1><div class="sub">Entradas, saídas, estoque mínimo, custo médio e consumo por chamado</div></div>
+      <div><h1>Estoque</h1><div class="sub">Entradas, saídas e estoque mínimo</div></div>
       <div class="actions">${can("stock.edit") ? `<button class="btn" data-mov="entrada">${icon("download")} Entrada</button><button class="btn" data-mov="saida">Saída avulsa</button><button class="btn primary" id="new">${icon("plus")} Novo produto</button>` : ""}</div>
     </div>
     <div class="tabs">${[["produtos", "Produtos"], ["movimentos", "Movimentações"]]
