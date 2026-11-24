@@ -16,12 +16,6 @@
   </script>
 </head>
 <body data-demo="{{ '1' if demo else '0' }}">
-  <div class="splash" id="splash" role="status" aria-label="Carregando">
-    <div class="splash-inner">
-      <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
-      <div class="splash-bar"></div>
-    </div>
-  </div>
   <div id="root"></div>
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>

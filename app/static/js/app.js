@@ -34,6 +34,9 @@ const NAV = [
   { path: "usuarios", label: "Usuários e acessos", icon: "shield", perm: "users.manage", view: users },
 ];
 
+// rótulos curtos da barra de abas do celular
+const TAB_LABELS = { dashboard: "Início", ativos: "Ativos", monitoramento: "Sensores", fornecedores: "Fornec.", indicadores: "BI", usuarios: "Usuários" };
+
 let alertsCache = [];
 
 // ------------------------------------------------------------------ Tema claro/escuro
@@ -64,12 +67,30 @@ function bindThemeSwitch(scope, after) {
   }));
 }
 
-// ------------------------------------------------------------------ Tela de carregamento
-const splashStart = Date.now();
+// ------------------------------------------------------------------ Tela de carregamento (ao entrar e ao sair)
+let splashShownAt = 0;
+function showSplash(text) {
+  let el = document.getElementById("splash");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "splash";
+    el.className = "splash";
+    el.setAttribute("role", "status");
+    el.innerHTML = `<div class="splash-inner">
+      <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
+      <div class="splash-bar"></div>
+      <span class="splash-text"></span>
+    </div>`;
+    document.body.appendChild(el);
+  }
+  el.querySelector(".splash-text").textContent = text;
+  el.classList.remove("out");
+  splashShownAt = Date.now();
+}
 function hideSplash() {
   const el = document.getElementById("splash");
   if (!el) return;
-  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 500); }, Math.max(0, 900 - (Date.now() - splashStart)));
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 450); }, Math.max(0, 1100 - (Date.now() - splashShownAt)));
 }
 
 // ------------------------------------------------------------------ Login
@@ -106,9 +127,9 @@ function renderLogin() {
     </section>
   </div>`;
   bindThemeSwitch(root);
-  hideSplash();
   const form = document.getElementById("login-form");
   const submit = async () => {
+    showSplash("Entrando…");
     try {
       const { user } = await api.post("/api/auth/login", { username: form.username.value, password: form.password.value });
       state.user = user;
@@ -116,6 +137,7 @@ function renderLogin() {
     } catch (err) {
       toast(err.message, "err");
     }
+    hideSplash();
   };
   form.addEventListener("submit", (e) => { e.preventDefault(); submit(); });
   form.querySelectorAll("[data-user]").forEach((b) => b.addEventListener("click", () => {
@@ -133,20 +155,23 @@ function renderShell() {
   const nav = NAV.filter((n) => n.section || can(n.perm));
   // remove seções vazias
   const cleaned = nav.filter((n, i) => !n.section || (nav[i + 1] && !nav[i + 1].section));
+  const tabs = nav.filter((n) => !n.section).slice(0, 4);
   root.innerHTML = `
   <div class="app${collapsed ? " collapsed" : ""}" id="app">
     <aside class="sidebar" id="sidebar">
-      <div class="brand-row">
-        <a class="brand" href="#/" aria-label="Hospital Rio Grande — início">
-          <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
-          <span class="logo-mask logo-symbol" aria-hidden="true"></span>
-        </a>
-        <button class="icon-btn collapse-btn" id="collapse-btn" aria-label="Recolher menu" aria-expanded="${!collapsed}" title="Abrir/fechar menu">${icon("sidebar")}</button>
-      </div>
+      <a class="brand" href="#/" aria-label="Hospital Rio Grande — início">
+        <span class="logo-mask logo-wordmark" aria-hidden="true"></span>
+        <span class="logo-mask logo-symbol" aria-hidden="true"></span>
+      </a>
       <nav class="nav" aria-label="Menu principal">
         ${cleaned.map((n) => n.section ? `<div class="nav-section">${n.section}</div>`
           : `<a href="#/${n.path}" data-path="${n.path}" title="${n.label}">${icon(n.icon)}<span>${n.label}</span>${n.badge ? '<span class="badge-count hidden" data-badge="' + n.badge + '"></span>' : ""}</a>`).join("")}
       </nav>
+      <div class="sidebar-foot">
+        <button type="button" class="collapse-btn" id="collapse-btn" aria-expanded="${!collapsed}" title="${collapsed ? "Abrir menu" : "Recolher menu"}">
+          ${icon("sidebar")}<span>Recolher menu</span>
+        </button>
+      </div>
     </aside>
     <div class="main">
       <header class="topbar">
@@ -163,24 +188,30 @@ function renderShell() {
       </header>
       <main class="content" id="view"></main>
     </div>
+    <nav class="tabbar" aria-label="Navegação principal">
+      ${tabs.map((n) => `<a href="#/${n.path}" data-path="${n.path}">${icon(n.icon)}<span>${TAB_LABELS[n.path] || n.label}</span></a>`).join("")}
+      <button type="button" id="tab-menu">${icon("menu")}<span>Menu</span></button>
+    </nav>
   </div>`;
   const sidebar = document.getElementById("sidebar");
   let scrim = null;
   const closeMenu = () => { sidebar.classList.remove("open"); if (scrim) { scrim.remove(); scrim = null; } };
-  document.getElementById("menu-toggle").addEventListener("click", () => {
+  const openMenu = () => {
     sidebar.classList.add("open");
     scrim = document.createElement("div");
     scrim.className = "scrim";
     scrim.addEventListener("click", closeMenu);
     document.body.appendChild(scrim);
-  });
+  };
+  document.getElementById("menu-toggle").addEventListener("click", openMenu);
+  document.getElementById("tab-menu").addEventListener("click", openMenu);
   sidebar.addEventListener("click", (e) => { if (e.target.closest("a")) closeMenu(); });
   const collapseBtn = document.getElementById("collapse-btn");
   collapseBtn.addEventListener("click", () => {
     const app = document.getElementById("app");
     const closed = app.classList.toggle("collapsed");
     collapseBtn.setAttribute("aria-expanded", String(!closed));
-    collapseBtn.setAttribute("aria-label", closed ? "Abrir menu" : "Recolher menu");
+    collapseBtn.title = closed ? "Abrir menu" : "Recolher menu";
     try { localStorage.setItem("rg-sidebar", closed ? "closed" : "open"); } catch (e) { /* sem armazenamento */ }
     setTimeout(() => window.dispatchEvent(new Event("resize")), 260); // reajusta os gráficos
   });
@@ -219,11 +250,13 @@ function showUserMenu() {
     <button class="dd-item" data-act="pwd">${icon("key")} Alterar senha</button>
     <button class="dd-item" data-act="logout">${icon("logout")} Sair</button>`);
   dd.querySelector('[data-act="logout"]').addEventListener("click", async () => {
-    await api.post("/api/auth/logout");
-    state.user = null;
     dd.remove();
+    showSplash("Saindo…");
+    try { await api.post("/api/auth/logout"); } catch (e) { /* sessão já encerrada */ }
+    state.user = null;
     location.hash = "";
     renderLogin();
+    hideSplash();
   });
   dd.querySelector('[data-act="pwd"]').addEventListener("click", () => {
     dd.remove();
@@ -273,7 +306,7 @@ async function route() {
   const query = Object.fromEntries(new URLSearchParams(qs || ""));
   const home = can("dashboard.view") ? "dashboard" : "chamados";
   const entry = NAV.find((n) => n.path === (path || home));
-  document.querySelectorAll(".nav a").forEach((a) => a.classList.toggle("active", a.dataset.path === (path || home)));
+  document.querySelectorAll(".nav a, .tabbar a").forEach((a) => a.classList.toggle("active", a.dataset.path === (path || home)));
   const view = document.getElementById("view");
   destroyCharts();
   document.querySelector(".dropdown")?.remove();
@@ -304,7 +337,6 @@ async function startApp() {
   state.lookups = await api.get("/api/lookups");
   renderShell();
   await route();
-  hideSplash();
   refreshAlerts();
 }
 
