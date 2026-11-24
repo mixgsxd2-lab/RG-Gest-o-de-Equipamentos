@@ -467,6 +467,43 @@ SENSORS = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Demonstração enxuta: mantém só um conjunto pequeno e coerente de dados
+# (equipamentos críticos da engenharia clínica + infraestrutura essencial).
+# ---------------------------------------------------------------------------
+DEMO_ASSET_TAGS = {
+    "RG-EQ-0001", "RG-EQ-0004", "RG-EQ-0005", "RG-EQ-0006", "RG-EQ-0007", "RG-EQ-0009", "RG-EQ-0013",
+    "RG-EQ-0015", "RG-EQ-0018", "RG-EQ-0019", "RG-IN-0001", "RG-IN-0002", "RG-IN-0007", "RG-IN-0010",
+}
+DEMO_PLAN_TAGS = {"RG-EQ-0001", "RG-EQ-0006", "RG-EQ-0013", "RG-EQ-0018", "RG-IN-0001", "RG-IN-0002", "RG-IN-0007"}
+DEMO_SENSOR_TAGS = {"RG-IN-0001", "RG-IN-0007", "RG-IN-0010"}
+DEMO_CONTRACTS = {"CT-2024-011", "CT-2023-021", "CT-2024-030", "CT-2023-008"}
+DEMO_REQUESTERS = {"ps.enfermagem", "cc.coordenacao"}  # além dos usuários de teste e técnicos
+DEMO_HISTORY_TICKETS = 24          # chamados antigos (já encerrados)
+DEMO_PREVENTIVE_RUNS = 2           # execuções passadas por plano preventivo
+DEMO_SENSOR_DAYS = 3               # dias de leituras por sensor
+
+ASSETS = [a for a in ASSETS if a[0] in DEMO_ASSET_TAGS]
+PLANS = [pl for pl in PLANS if pl[1] in DEMO_PLAN_TAGS]
+SENSORS = [x for x in SENSORS if x[4] in DEMO_SENSOR_TAGS]
+USERS = [u for u in USERS if u[2] != "solicitante" or u[0] in DEMO_REQUESTERS or u[0] == "usuario"]
+
+
+def _trim_template(tpl):
+    targets = [t for t in tpl[5] if t.startswith("sector:") or t in DEMO_ASSET_TAGS]
+    return tpl[:5] + (targets,) + tpl[6:] if targets else None
+
+
+TEMPLATES = [t for t in map(_trim_template, TEMPLATES) if t]
+_used_products = {code for t in TEMPLATES for code, _q in t[9]}
+PRODUCTS = [pr for pr in PRODUCTS if pr[0] in _used_products][:12]
+_kept_products = {pr[0] for pr in PRODUCTS}
+TEMPLATES = [t[:9] + ([m for m in t[9] if m[0] in _kept_products],) + t[10:] for t in TEMPLATES]
+
+_used_sectors = ({a[4] for a in ASSETS} | {u[3] for u in USERS if u[3]} | {x[5] for x in SENSORS if x[5]} |
+                 {t.split(":", 1)[1] for tpl in TEMPLATES for t in tpl[5] if t.startswith("sector:")})
+SECTORS = [sec for sec in SECTORS if sec[0] in _used_sectors]
+
 def _dt(days_ago, hour=None, rnd=None):
     rnd = rnd or random
     base = datetime.now().replace(second=0, microsecond=0) - timedelta(days=days_ago)
@@ -529,6 +566,7 @@ def seed_demo(seed=2026):
          12),
     ]
     contract_objs = []
+    contracts = [c for c in contracts if c[0] in DEMO_CONTRACTS]
     for number, sup, team, scope, start_off, end_off, value, resp, res in contracts:
         c = Contract(number=number, supplier=suppliers[sup], team=teams[team], scope=scope,
                      start_date=today + timedelta(days=start_off), end_date=today + timedelta(days=end_off),
@@ -576,7 +614,7 @@ def seed_demo(seed=2026):
     for u in users.values():
         if u.role == "solicitante" and u.sector:
             requesters_by_sector.setdefault(u.sector.name, []).append(u)
-    fallback_requesters = [users["usuario"], users["gestor"], users["ps.enfermagem"], users["internacao"]]
+    fallback_requesters = [users["usuario"], users["gestor"], users["ps.enfermagem"], users["cc.coordenacao"]]
 
     def tech_for(team_name, external=False):
         opts = [t for t in techs.values() if t.team.name == team_name and (t.supplier is not None) == external]
@@ -705,13 +743,13 @@ def seed_demo(seed=2026):
 
     # ---- Chamados históricos e atuais -------------------------------------------------
     history_specs = []
-    for i in range(100):
+    for i in range(DEMO_HISTORY_TICKETS):
         days_ago = rnd.uniform(15, 238)
         r = rnd.random()
         final = "encerrado" if r < 0.84 else "finalizado" if r < 0.92 else "cancelado" if r < 0.96 else "encerrado"
         history_specs.append((days_ago, final, rnd.random() < 0.14))
-    recent_status = (["aberto"] * 4 + ["recebido"] * 3 + ["aceito"] * 3 + ["em_execucao"] * 4 +
-                     ["aguardando"] * 3 + ["finalizado"] * 4 + ["encerrado"] * 5)
+    recent_status = (["aberto"] * 2 + ["recebido"] + ["aceito"] + ["em_execucao"] * 2 +
+                     ["aguardando"] + ["finalizado"] + ["encerrado"] * 2)
     for final in recent_status:
         days_ago = rnd.uniform(0.1, 12) if final in ("aberto", "recebido", "aceito") else rnd.uniform(0.5, 14)
         history_specs.append((days_ago, final, rnd.random() < 0.18))
@@ -747,7 +785,7 @@ def seed_demo(seed=2026):
         last = today + timedelta(days=due_in - plan.frequency_days)
         executions = []
         d = last
-        while d >= today - timedelta(days=235) and len(executions) < 8:
+        while d >= today - timedelta(days=235) and len(executions) < DEMO_PREVENTIVE_RUNS:
             if d < today:
                 executions.append(d)
             d -= timedelta(days=plan.frequency_days)
@@ -830,7 +868,7 @@ def seed_demo(seed=2026):
                    protocol=rnd.choice(["MQTT", "Modbus TCP", "HTTP"]))
         db.session.add(s)
         db.session.flush()
-        points = 7 * 24 * 2
+        points = DEMO_SENSOR_DAYS * 24 * 2
         value = base
         for i in range(points):
             ts = now - timedelta(minutes=30 * (points - i))
